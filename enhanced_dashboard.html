@@ -1904,11 +1904,8 @@
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </button>
                         </div>
-                        <button class="login-btn" id="loginBtn" onclick="showLoginModal()" style="background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-right: 10px;">
+                        <button class="login-btn" id="loginBtn" onclick="showLoginModal()">
                             <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                        <button class="login-btn" onclick="testLoginModal()" style="background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
-                            <i class="fas fa-bug"></i> Test Login
                         </button>
                     </div>
                 </div>
@@ -2578,7 +2575,32 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:8000' : '';
+        // Railway Backend Configuration
+        const RAILWAY_URL = 'https://data-analytics-master.up.railway.app';
+        const API_BASE = window.location.origin.includes('localhost') 
+            ? RAILWAY_URL  // Use Railway URL when running locally
+            : window.location.origin;  // Use same origin when deployed
+        
+        // Debug function to test Railway connection
+        function testRailwayConnection() {
+            console.log('Testing Railway connection...');
+            console.log('API Base URL:', API_BASE);
+            
+            // Test health endpoint
+            fetch(`${API_BASE}/health`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Railway connection successful:', data);
+                    return true;
+                })
+                .catch(error => {
+                    console.error('❌ Railway connection failed:', error);
+                    return false;
+                });
+        }
+        
+        // Make test function available globally
+        window.testRailwayConnection = testRailwayConnection;
         let salesData = [];
         let productsData = [];
         let filteredSalesData = [];
@@ -5924,17 +5946,6 @@
             }
         }
 
-        // Debug function to test login modal
-        function testLoginModal() {
-            console.log('Testing login modal...');
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                console.log('Modal found, showing...');
-                showLoginModal();
-            } else {
-                console.error('Modal not found!');
-            }
-        }
 
         // Apply role-based permissions
         function applyRoleBasedPermissions(role) {
