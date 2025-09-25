@@ -1,0 +1,16 @@
+product_id,quantity,unit_price,total_amount,sale_date,region,customer_name,sales_rep
+1,2,1299.99,2599.98,2024-01-15,North,John Smith,Alice Johnson
+2,5,49.99,249.95,2024-01-16,North,Jane Doe,Alice Johnson
+3,1,299.99,299.99,2024-01-17,South,Bob Wilson,Mike Brown
+4,1,599.99,599.99,2024-01-18,East,Sarah Davis,Lisa Green
+5,3,89.99,269.97,2024-01-19,West,Tom Anderson,David Lee
+1,1,1299.99,1299.99,2024-02-10,North,Emily Chen,Alice Johnson
+6,2,399.99,799.98,2024-02-11,South,Mark Taylor,Mike Brown
+7,4,129.99,519.96,2024-02-12,East,Lisa Wang,Lisa Green
+8,2,79.99,159.98,2024-02-13,West,Chris Rodriguez,David Lee
+9,1,99.99,99.99,2024-02-14,North,Amy Johnson,Alice Johnson
+2,3,49.99,149.97,2024-03-05,South,Kevin Park,Mike Brown
+3,2,299.99,599.98,2024-03-06,East,Rachel Kim,Lisa Green
+4,1,599.99,599.99,2024-03-07,West,Daniel Liu,David Lee
+5,2,89.99,179.98,2024-03-08,North,Michelle Garcia,Alice Johnson
+10,10,24.99,249.90,2024-03-09,South,Andrew White,Mike Brown
