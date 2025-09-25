@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile.simple"
   },
   "deploy": {
-    "startCommand": "python backend/production_server_cloud.py",
+    "startCommand": "python backend/production_server_railway.py",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 60,
     "restartPolicyType": "ON_FAILURE",

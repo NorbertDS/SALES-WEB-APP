@@ -35,6 +35,9 @@ COPY . .
 # Create logs directory
 RUN mkdir -p /app/logs
 
+# Copy the Railway-optimized server
+COPY backend/production_server_railway.py /app/backend/
+
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
