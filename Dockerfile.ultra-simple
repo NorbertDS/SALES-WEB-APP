@@ -1,0 +1,28 @@
+# Ultra-simple Railway Dockerfile
+FROM python:3.11-slim
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install fastapi uvicorn
+
+# Copy and run the simple server
+COPY backend/simple_server.py /app/
+COPY backend/requirements.txt /app/
+
+# Install additional dependencies if needed
+RUN pip install -r requirements.txt 2>/dev/null || echo "Requirements not found, continuing..."
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:$PORT/health || exit 1
+
+# Expose port
+EXPOSE $PORT
+
+# Run the application
+CMD ["python", "simple_server.py"]
