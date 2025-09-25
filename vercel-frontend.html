@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .api-status {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+        .endpoint {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-online {
+            background: #28a745;
+        }
+        .status-offline {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Sales Analytics Dashboard</h1>
+            <p>Railway Backend + Vercel Frontend</p>
+        </div>
+
+        <div class="api-status">
+            <h3>📡 Backend API Status</h3>
+            <p><span id="status-indicator" class="status-indicator status-offline"></span>
+            <span id="status-text">Checking connection...</span></p>
+            <p><strong>Backend URL:</strong> <span id="backend-url">Loading...</span></p>
+        </div>
+
+        <div class="endpoint">
+            <h4>🔗 Available Endpoints:</h4>
+            <p><strong>Root:</strong> <span id="root-url">-</span></p>
+            <p><strong>Health:</strong> <span id="health-url">-</span></p>
+            <p><strong>Test:</strong> <span id="test-url">-</span></p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="#" id="test-api-btn" class="btn">Test API Connection</a>
+            <a href="#" id="open-dashboard-btn" class="btn">Open Full Dashboard</a>
+        </div>
+
+        <div id="api-response" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; display: none;">
+            <h4>API Response:</h4>
+            <pre id="response-content"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Get Railway backend URL (replace with your actual Railway URL)
+        const RAILWAY_URL = 'https://YOUR-RAILWAY-APP-NAME.railway.app';
+        
+        // Update URLs
+        document.getElementById('backend-url').textContent = RAILWAY_URL;
+        document.getElementById('root-url').textContent = RAILWAY_URL + '/';
+        document.getElementById('health-url').textContent = RAILWAY_URL + '/health';
+        document.getElementById('test-url').textContent = RAILWAY_URL + '/api/test';
+
+        // Test API connection
+        async function testAPI() {
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            const responseDiv = document.getElementById('api-response');
+            const responseContent = document.getElementById('response-content');
+
+            try {
+                statusText.textContent = 'Testing connection...';
+                
+                const response = await fetch(RAILWAY_URL + '/health');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusIndicator.className = 'status-indicator status-online';
+                    statusText.textContent = 'Connected successfully!';
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                    responseDiv.style.display = 'block';
+                } else {
+                    throw new Error('API returned error status');
+                }
+            } catch (error) {
+                statusIndicator.className = 'status-indicator status-offline';
+                statusText.textContent = 'Connection failed: ' + error.message;
+                responseContent.textContent = 'Error: ' + error.message;
+                responseDiv.style.display = 'block';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('test-api-btn').addEventListener('click', testAPI);
+        document.getElementById('open-dashboard-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Open the full dashboard in a new tab
+            window.open('enhanced_dashboard.html', '_blank');
+        });
+
+        // Auto-test on load
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

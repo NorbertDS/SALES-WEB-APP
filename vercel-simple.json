@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "vercel-frontend.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/vercel-frontend.html"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/enhanced_dashboard.html"
+    }
+  ]
+}

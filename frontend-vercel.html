@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        
+        .status-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .status-text {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .api-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .api-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .api-endpoint {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 5px 0;
+            word-break: break-all;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            color: #856404;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📊 Sales Analytics</div>
+        <div class="subtitle">Railway Backend + Vercel Frontend</div>
+        
+        <div class="status-card">
+            <div class="status-title">✅ Backend Status</div>
+            <div class="status-text" id="backend-status">Checking connection...</div>
+        </div>
+        
+        <div class="api-info">
+            <div class="api-title">🔗 API Endpoints</div>
+            <div class="api-endpoint" id="api-root">Loading...</div>
+            <div class="api-endpoint" id="api-health">Loading...</div>
+            <div class="api-endpoint" id="api-test">Loading...</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🚀 How to Use This System</h3>
+            <ol>
+                <li><strong>Backend API</strong> is running on Railway</li>
+                <li><strong>Frontend</strong> can be deployed to Vercel</li>
+                <li><strong>Full Dashboard</strong> available in enhanced_dashboard.html</li>
+                <li><strong>Database</strong> can be added later for production</li>
+            </ol>
+        </div>
+        
+        <a href="#" class="btn" onclick="testAPI()">🧪 Test API Connection</a>
+        <a href="enhanced_dashboard.html" class="btn btn-secondary">📈 Open Full Dashboard</a>
+        
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // Get Railway backend URL (you'll need to replace this with your actual Railway URL)
+        const RAILWAY_URL = 'https://your-app-name.railway.app';
+        
+        // Update API endpoints display
+        document.getElementById('api-root').textContent = `GET ${RAILWAY_URL}/`;
+        document.getElementById('api-health').textContent = `GET ${RAILWAY_URL}/health`;
+        document.getElementById('api-test').textContent = `GET ${RAILWAY_URL}/api/test`;
+        
+        // Test API connection
+        async function testAPI() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="status-text">Testing API connection...</div>';
+            
+            try {
+                // Test root endpoint
+                const rootResponse = await fetch(`${RAILWAY_URL}/`);
+                const rootData = await rootResponse.json();
+                
+                // Test health endpoint
+                const healthResponse = await fetch(`${RAILWAY_URL}/health`);
+                const healthData = await healthResponse.json();
+                
+                // Test API endpoint
+                const apiResponse = await fetch(`${RAILWAY_URL}/api/test`);
+                const apiData = await apiResponse.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        <strong>✅ API Connection Successful!</strong><br>
+                        Root: ${rootData.message}<br>
+                        Health: ${healthData.status}<br>
+                        API: ${apiData.message}
+                    </div>
+                `;
+                
+                document.getElementById('backend-status').innerHTML = '✅ Connected to Railway backend';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <strong>❌ API Connection Failed</strong><br>
+                        Error: ${error.message}<br>
+                        Make sure your Railway backend is deployed and running.
+                    </div>
+                `;
+                
+                document.getElementById('backend-status').innerHTML = '❌ Backend connection failed';
+            }
+        }
+        
+        // Auto-test on page load
+        window.onload = function() {
+            setTimeout(testAPI, 1000);
+        };
+        
+        // Update Railway URL when you get it
+        function updateRailwayURL(newUrl) {
+            const RAILWAY_URL = newUrl;
+            document.getElementById('api-root').textContent = `GET ${RAILWAY_URL}/`;
+            document.getElementById('api-health').textContent = `GET ${RAILWAY_URL}/health`;
+            document.getElementById('api-test').textContent = `GET ${RAILWAY_URL}/api/test`;
+        }
+    </script>
+</body>
+</html>
