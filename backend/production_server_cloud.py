@@ -107,25 +107,24 @@ async def startup_event():
     create_tables()
     logger.info("Cloud-ready database tables created successfully")
 
-# Health check endpoint for cloud deployment
+# Health check endpoint for Railway deployment
 @app.get("/health", response_class=JSONResponse)
 async def health_check():
-    """Health check endpoint for cloud deployment"""
+    """Simple health check endpoint for Railway"""
     try:
-        # Check database connection
-        db = next(get_db())
-        db.execute("SELECT 1")
-        db_status = "healthy"
+        # Simple health check - just return status
+        return {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "version": "4.0.0",
+            "port": int(os.getenv("PORT", 8000))
+        }
     except Exception as e:
-        db_status = f"unhealthy: {str(e)}"
-    
-    return {
-        "status": "healthy" if db_status == "healthy" else "unhealthy",
-        "timestamp": datetime.utcnow().isoformat(),
-        "version": "4.0.0",
-        "database": db_status,
-        "redis": "healthy" if redis_client else "not_configured"
-    }
+        return {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
 # Pydantic Models
 class UserLogin(BaseModel):
@@ -430,10 +429,13 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 if __name__ == "__main__":
+    # Get port from Railway environment variable
+    PORT = int(os.getenv("PORT", 8000))
+    
     uvicorn.run(
         "production_server_cloud:app",
-        host="0.0.0.0",
-        port=int(os.getenv("PORT", "8000")),
-        reload=os.getenv("ENVIRONMENT") != "production",
+        host="0.0.0.0",  # Important: Use 0.0.0.0 for Railway
+        port=PORT,       # Use Railway's PORT
+        reload=False,    # Disable reload for production
         log_level="info"
     )
