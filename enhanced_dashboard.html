@@ -1904,10 +1904,10 @@
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </button>
                         </div>
-                        <button class="login-btn" id="loginBtn" onclick="showLoginModal()">
+                        <button class="login-btn" id="loginBtn" onclick="showLoginModal()" style="background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-right: 10px;">
                             <i class="fas fa-sign-in-alt"></i> Login
                         </button>
-                        <button class="login-btn" onclick="showLoginModal()" style="margin-left: 10px; background: #10b981;">
+                        <button class="login-btn" onclick="testLoginModal()" style="background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                             <i class="fas fa-bug"></i> Test Login
                         </button>
                     </div>
@@ -5924,6 +5924,18 @@
             }
         }
 
+        // Debug function to test login modal
+        function testLoginModal() {
+            console.log('Testing login modal...');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                console.log('Modal found, showing...');
+                showLoginModal();
+            } else {
+                console.error('Modal not found!');
+            }
+        }
+
         // Apply role-based permissions
         function applyRoleBasedPermissions(role) {
             console.log('Applying role-based permissions for role:', role);
@@ -6681,8 +6693,8 @@
                 console.error('Error creating user:', error);
                 showNotification('❌ Failed to create user: ' + error.message, 'error');
             }
-        });
-        }
+            });
+        }}
 
         // Edit User Form Handler
         const editUserForm = document.getElementById('editUserForm');
