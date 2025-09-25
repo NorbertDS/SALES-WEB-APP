@@ -432,10 +432,18 @@ if __name__ == "__main__":
     # Get port from Railway environment variable
     PORT = int(os.getenv("PORT", 8000))
     
-    uvicorn.run(
-        "production_server_cloud:app",
-        host="0.0.0.0",  # Important: Use 0.0.0.0 for Railway
-        port=PORT,       # Use Railway's PORT
-        reload=False,    # Disable reload for production
-        log_level="info"
-    )
+    print(f"🚀 Starting Sales Analytics API on port {PORT}")
+    print(f"🌍 Host: 0.0.0.0")
+    print(f"📊 Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    
+    try:
+        uvicorn.run(
+            "production_server_cloud:app",
+            host="0.0.0.0",  # Important: Use 0.0.0.0 for Railway
+            port=PORT,       # Use Railway's PORT
+            reload=False,    # Disable reload for production
+            log_level="info"
+        )
+    except Exception as e:
+        print(f"❌ Error starting server: {e}")
+        raise

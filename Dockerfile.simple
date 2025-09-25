@@ -1,4 +1,4 @@
-# Railway-optimized Dockerfile for Sales Analytics System
+# Simple Railway Dockerfile for Sales Analytics System
 FROM python:3.11-slim
 
 # Set environment variables
@@ -22,7 +22,7 @@ RUN apt-get update \
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install additional dependencies for Railway
+# Install additional dependencies
 RUN pip install --no-cache-dir \
     slowapi \
     redis \
@@ -35,24 +35,17 @@ COPY . .
 # Create logs directory
 RUN mkdir -p /app/logs
 
-# Create startup script
-RUN echo '#!/bin/bash \
-# Start the Python application directly \
-python backend/production_server_cloud.py' > /app/start.sh
-
-RUN chmod +x /app/start.sh
-
 # Create non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:$PORT/health || exit 1
 
 # Expose port (Railway will set PORT environment variable)
 EXPOSE $PORT
 
-# Run the startup script
-CMD ["/app/start.sh"]
+# Run the application directly
+CMD ["python", "backend/production_server_cloud.py"]
