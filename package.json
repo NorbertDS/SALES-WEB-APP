@@ -1,0 +1,24 @@
+{
+  "name": "sales-analytics-dashboard",
+  "version": "1.0.0",
+  "description": "Sales Analytics Dashboard - Vercel Deployment",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "start": "echo 'Static site served by Vercel'",
+    "dev": "echo 'Use local development server'"
+  },
+  "keywords": [
+    "sales",
+    "analytics",
+    "dashboard",
+    "vercel"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
