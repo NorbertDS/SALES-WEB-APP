@@ -250,6 +250,11 @@
             flex-wrap: wrap;
         }
 
+        /* Hide navigation menu before login */
+        .nav-menu.hidden {
+            display: none !important;
+        }
+
         .nav-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1913,7 +1918,7 @@
             
             <!-- Navigation Menu -->
             <div class="header-nav">
-                <div class="nav-menu">
+                <div class="nav-menu hidden">
                     <button class="nav-btn" onclick="refreshAllData()">
                         <i class="fas fa-sync-alt"></i> Refresh Data
                     </button>
@@ -5925,6 +5930,7 @@
             const loginPrompt = document.getElementById('loginPrompt');
             const mainDashboard = document.getElementById('mainDashboard');
             const sidebar = document.getElementById('sidebar');
+            const navMenu = document.querySelector('.nav-menu');
 
             if (isLoggedIn && currentUser) {
                 userInfo.style.display = 'flex';
@@ -5932,6 +5938,7 @@
                 loginPrompt.style.display = 'none';
                 mainDashboard.classList.remove('auth-required');
                 sidebar.classList.remove('auth-required');
+                if (navMenu) navMenu.classList.remove('hidden');
                 
                 userName.textContent = currentUser.name || currentUser.email;
                 userAvatar.textContent = (currentUser.name || currentUser.email).charAt(0).toUpperCase();
@@ -5948,6 +5955,7 @@
                 loginPrompt.style.display = 'block';
                 mainDashboard.classList.add('auth-required');
                 sidebar.classList.add('auth-required');
+                if (navMenu) navMenu.classList.add('hidden');
                 // Show login modal when not authenticated
                 showLoginModal();
             }
