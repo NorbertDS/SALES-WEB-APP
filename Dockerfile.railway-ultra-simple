@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 # Install Python dependencies
 RUN pip install fastapi uvicorn
 
-# Copy all necessary files
+# Copy only the necessary files (no backend directory)
 COPY railway_simple.py /app/
 COPY enhanced_dashboard.html /app/
 COPY config.js /app/

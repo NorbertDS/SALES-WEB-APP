@@ -217,5 +217,7 @@ async def create_product(request: Request):
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
-    print(f"Starting Railway server on port {port}")
+    print(f"🚀 Starting Railway server on port {port}")
+    print(f"📊 Sales Analytics Pro - Railway Deployment")
+    print(f"🌐 Server will be available at: http://0.0.0.0:{port}")
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")

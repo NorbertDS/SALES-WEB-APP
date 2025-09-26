@@ -1,0 +1,22 @@
+# Railway ignore file - prevent auto-detection of other server files
+backend/
+Dockerfile.simple
+Dockerfile.ultra-simple
+Dockerfile.railway
+Dockerfile.railway-complete
+Dockerfile.railway-simple
+Dockerfile.cloud
+docker-compose.cloud.yml
+render.yaml
+vercel.json
+vercel-simple.json
+vercel-frontend.html
+railway-frontend.html
+railway-frontend.json
+railway_server.py
+cors-proxy-server.py
+deploy-*.sh
+fix-*.sh
+*.md
+sample_data/
+frontend/
