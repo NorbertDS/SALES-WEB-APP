@@ -2584,10 +2584,8 @@
         const RAILWAY_URL = 'https://data-analytics-master.up.railway.app';
         const PROXY_URL = 'http://localhost:8080/proxy';
         
-        // Try Railway directly first, fallback to proxy if CORS fails
-        const API_BASE = window.location.origin.includes('localhost') 
-            ? RAILWAY_URL  // Use Railway URL when running locally
-            : window.location.origin;  // Use same origin when deployed
+        // Always use Railway URL for API calls
+        const API_BASE = RAILWAY_URL;
         
         // Debug function to test Railway connection
         function testRailwayConnection() {
@@ -2892,7 +2890,8 @@
             const netProfit = grossProfit - totalExpenses;
             
             // Calculate profit margin based on net profit vs revenue
-            const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+            // Ensure we don't get negative margins due to data issues
+            const profitMargin = totalRevenue > 0 ? Math.max(0, (netProfit / totalRevenue * 100)) : 0;
             
             console.log('Calculated values:', {
                 totalRevenue,
@@ -6401,10 +6400,14 @@
                     // Update UI
                     updateAuthUI(true);
                     
-                    // Hide login modal with delay to ensure UI updates
-                    setTimeout(() => {
-                        hideLoginModal();
-                    }, 100);
+                    // Hide login modal immediately
+                    hideLoginModal();
+                    
+                    // Also hide any login prompt overlays
+                    const loginPrompt = document.getElementById('loginPrompt');
+                    if (loginPrompt) {
+                        loginPrompt.style.display = 'none';
+                    }
                     
                     // Load dashboard data after successful login
                     await loadKPIData();
