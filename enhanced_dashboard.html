@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Analytics Pro - Interactive Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -2742,20 +2742,21 @@
 
         // Initialize dashboard
         async function init() {
-            // Check authentication first
-            checkAuthStatus();
-            
-            // Load expenses data from localStorage
-            loadExpensesFromStorage();
-            
-            // Only load data if user is authenticated
-            if (currentUser && authToken) {
-                // Check API status in background
-                checkAPIStatus();
-                await loadKPIData();
-                await loadSalesData();
-                await loadProducts();
-                setTodayDate();
+            try {
+                // Check authentication first
+                checkAuthStatus();
+                
+                // Load expenses data from localStorage
+                loadExpensesFromStorage();
+                
+                // Only load data if user is authenticated
+                if (currentUser && authToken) {
+                    // Check API status in background
+                    await checkAPIStatus();
+                    await loadKPIData();
+                    await loadSalesData();
+                    await loadProducts();
+                    setTodayDate();
                 
                 // Sync and fix any data inconsistencies
                 syncProductData();
@@ -2819,6 +2820,10 @@
                     }
                 }
             });
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showNotification('❌ Error initializing dashboard', 'error');
+            }
         }
 
         // Sync product data to fix "Unknown" product issues
@@ -2857,7 +2862,9 @@
                 
                 // Add timeout to prevent hanging
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                }, 10000); // 10 second timeout
                 
                 const response = await fetch(`${API_BASE}/health`, {
                     signal: controller.signal,
@@ -2880,9 +2887,15 @@
                 if (response.ok) {
                     const data = await response.json();
                     console.log('✅ Railway API connected:', data);
-                    document.getElementById('statusText').textContent = '✅ Railway Server Online - Ready to show analytics!';
+                    const statusText = document.getElementById('statusText');
                     const statusIndicator = document.getElementById('statusIndicator');
-                    if (statusIndicator) statusIndicator.className = 'status-indicator online';
+                    
+                    if (statusText) {
+                        statusText.textContent = '✅ Railway Server Online - Ready to show analytics!';
+                    }
+                    if (statusIndicator) {
+                        statusIndicator.className = 'status-indicator online';
+                    }
                     return true;
                 } else {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -2893,13 +2906,22 @@
                 // Railway is the primary and only connection method
                 console.log('🔄 Railway connection failed, will retry automatically...');
                 
-                if (error.name === 'AbortError') {
-                    document.getElementById('statusText').textContent = '⏱️ API Server Timeout - Check connection';
-                } else {
-                    document.getElementById('statusText').textContent = `❌ API Server Offline - ${error.message}`;
-                }
+                const statusText = document.getElementById('statusText');
                 const statusIndicator = document.getElementById('statusIndicator');
-                if (statusIndicator) statusIndicator.className = 'status-indicator offline';
+                
+                if (error.name === 'AbortError') {
+                    if (statusText) {
+                        statusText.textContent = '⏱️ API Server Timeout - Check connection';
+                    }
+                } else {
+                    if (statusText) {
+                        statusText.textContent = `❌ API Server Offline - ${error.message}`;
+                    }
+                }
+                
+                if (statusIndicator) {
+                    statusIndicator.className = 'status-indicator offline';
+                }
                 return false;
             }
         }
@@ -6938,10 +6960,19 @@
         }
         
 
-        // Auto-refresh every 30 seconds
-        setInterval(async () => {
-            await checkAPIStatus();
-        }, 30000);
+        // Auto-refresh every 30 seconds with error handling
+        let refreshInterval;
+        try {
+            refreshInterval = setInterval(async () => {
+                try {
+                    await checkAPIStatus();
+                } catch (error) {
+                    console.error('Auto-refresh error:', error);
+                }
+            }, 30000);
+        } catch (error) {
+            console.error('Failed to set up auto-refresh:', error);
+        }
 
         // User Management Functions
         let usersData = [];
