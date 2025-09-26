@@ -2618,15 +2618,41 @@
         let salesData = [];
         let productsData = [];
         let filteredSalesData = [];
+        let expensesData = []; // Add expenses data array
         let currentCurrency = 'USD';
         let currencyRate = { USD: 1, KES: 135 }; // 1 USD = 135 KES (realistic current rate)
         let charts = {};
         let activeFilters = {}; // Store active filters for cross-filtering
 
+        // Load expenses from localStorage
+        function loadExpensesFromStorage() {
+            const savedExpenses = localStorage.getItem('expensesData');
+            if (savedExpenses) {
+                expensesData = JSON.parse(savedExpenses);
+                console.log('✅ Expenses loaded from storage:', expensesData);
+            } else {
+                // Initialize with sample expenses if none exist
+                expensesData = [
+                    { id: 1, description: 'Office Rent', amount: 2000, category: 'Fixed', date: '2024-01-01' },
+                    { id: 2, description: 'Utilities', amount: 500, category: 'Variable', date: '2024-01-01' },
+                    { id: 3, description: 'Marketing', amount: 1000, category: 'Marketing', date: '2024-01-01' }
+                ];
+                saveExpensesToStorage();
+            }
+        }
+
+        // Save expenses to localStorage
+        function saveExpensesToStorage() {
+            localStorage.setItem('expensesData', JSON.stringify(expensesData));
+        }
+
         // Initialize dashboard
         async function init() {
             // Check authentication first
             checkAuthStatus();
+            
+            // Load expenses data from localStorage
+            loadExpensesFromStorage();
             
             // Only load data if user is authenticated
             if (currentUser && authToken) {
@@ -2861,11 +2887,11 @@
             // Calculate Gross Profit = Total Revenue - Cost of Goods Sold
             const grossProfit = totalRevenue - totalCosts;
             
-            // Calculate Net Profit = Gross Profit - Expenses (expenses will be added later)
-            const totalExpenses = expensesData.reduce((sum, expense) => sum + expense.amount, 0);
+            // Calculate Net Profit = Gross Profit - Expenses
+            const totalExpenses = expensesData.reduce((sum, expense) => sum + (expense.amount || 0), 0);
             const netProfit = grossProfit - totalExpenses;
             
-            // Calculate profit margin based on revenue
+            // Calculate profit margin based on net profit vs revenue
             const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
             
             console.log('Calculated values:', {
@@ -3212,8 +3238,7 @@
                     document.getElementById('addSaleForm').reset();
                     setTodayDate();
                     await loadSalesData();
-                    await loadKPIData();
-                    updateKPIsFromLocalData(); // Ensure local calculation is also updated
+                    updateKPIsFromLocalData(); // Calculate from actual sales data
                 } else {
                     throw new Error('Failed to add sale');
                 }
@@ -3270,7 +3295,7 @@
                     // Refresh all data
                     await loadProducts();
                     await loadSalesData();
-                    await loadKPIData();
+                    updateKPIsFromLocalData(); // Calculate from actual data
                     updateProfitLoss();
                     
                     // Refresh tables
@@ -6502,7 +6527,6 @@
         });
 
         // Expenses Calculator Functions
-        let expensesData = [];
 
         function showExpensesCalculator() {
             if (!currentUser) {
@@ -6720,7 +6744,9 @@
                 // Refresh all data
                 await loadSalesData();
                 await loadProducts();
-                await loadKPIData();
+                
+                // Calculate KPIs from actual sales data instead of API
+                updateKPIsFromLocalData();
                 updateProfitLoss();
                 renderSalesTable();
                 renderProductsTable();
@@ -6832,8 +6858,9 @@
                 if (response.ok) {
                     usersData = await response.json();
                     console.log('Users data loaded:', usersData);
+                    console.log('Number of users:', usersData.length);
                     renderUsersList();
-                    showNotification('✅ Users loaded successfully', 'success');
+                    showNotification(`✅ Users loaded successfully (${usersData.length} users)`, 'success');
                 } else {
                     const errorText = await response.text();
                     console.error('Failed to load users:', response.status, errorText);
@@ -6849,6 +6876,7 @@
             const usersList = document.getElementById('usersList');
             console.log('Rendering users list. Found usersList element:', usersList);
             console.log('Users data to render:', usersData);
+            console.log('Number of users to render:', usersData.length);
             
             if (!usersList) {
                 console.error('usersList element not found!');
@@ -6856,6 +6884,11 @@
             }
             
             usersList.innerHTML = '';
+            
+            if (usersData.length === 0) {
+                usersList.innerHTML = '<div class="no-users">No users found</div>';
+                return;
+            }
 
             usersData.forEach(user => {
                 const userCard = document.createElement('div');
@@ -6887,9 +6920,9 @@
                     </div>
                     <div class="user-permissions">
                         <span class="permission-tag ${user.role}">${user.role.toUpperCase()}</span>
-                        ${user.permissions ? user.permissions.map(perm => 
+                        ${user.permissions && user.permissions.length > 0 ? user.permissions.map(perm => 
                             `<span class="permission-tag">${perm}</span>`
-                        ).join('') : ''}
+                        ).join('') : '<span class="permission-tag">No permissions</span>'}
                     </div>
                 `;
                 usersList.appendChild(userCard);
