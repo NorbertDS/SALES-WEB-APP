@@ -2668,18 +2668,13 @@
             
             // Test health endpoint
             fetch(`${API_BASE}/health`)
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('✅ Railway connection successful:', data);
-                    showNotification('✅ Railway connection successful!', 'success');
                     return true;
                 })
                 .catch(error => {
                     console.error('❌ Railway connection failed:', error);
-                    showNotification('❌ Railway connection failed: ' + error.message, 'error');
                     return false;
                 });
         }

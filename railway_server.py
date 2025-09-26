@@ -1,61 +1,56 @@
 #!/usr/bin/env python3
 """
-Railway Frontend Server
-Serves the enhanced dashboard and static files
+Railway Complete Server - Serves both frontend and backend
 """
-
 import os
-import http.server
-import socketserver
-from urllib.parse import urlparse
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+import json
 
-class CustomHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        # Parse the URL
-        parsed_path = urlparse(self.path)
-        path = parsed_path.path
-        
-        # Route requests
-        if path == '/' or path == '/index.html':
-            # Serve the main dashboard
-            self.path = '/enhanced_dashboard.html'
-        elif path == '/dashboard':
-            # Alternative dashboard route
-            self.path = '/enhanced_dashboard.html'
-        elif path == '/health':
-            # Health check endpoint
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(b'{"status": "healthy", "service": "frontend"}')
-            return
-        
-        # Add CORS headers to all responses
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        
-        # Call parent method
-        super().do_GET()
-    
-    def do_OPTIONS(self):
-        # Handle preflight requests
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', '*')
-        self.end_headers()
+# Import the backend API
+from backend.simple_server import app as api_app
 
-if __name__ == '__main__':
-    PORT = int(os.getenv('PORT', 8000))
-    
-    print(f"🚀 Starting Railway Frontend Server on port {PORT}")
-    print(f"🌐 Dashboard will be available at: http://localhost:{PORT}/enhanced_dashboard.html")
-    print(f"📊 Alternative route: http://localhost:{PORT}/dashboard")
-    print(f"❤️ Health check: http://localhost:{PORT}/health")
-    
-    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"✅ Server running on port {PORT}")
-        httpd.serve_forever()
+# Create main app
+app = FastAPI(title="Sales Analytics Complete Server")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# Mount the API routes
+app.mount("/api", api_app)
+
+# Serve static files (frontend)
+app.mount("/static", StaticFiles(directory="."), name="static")
+
+@app.get("/")
+async def serve_frontend():
+    """Serve the main dashboard"""
+    return FileResponse("enhanced_dashboard.html")
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"message": "Sales Analytics Complete Server - Railway Deployment", "status": "running", "version": "2.0.0"}
+
+@app.get("/config")
+async def get_config():
+    """Serve configuration"""
+    try:
+        with open("config.js", "r") as f:
+            config_content = f.read()
+        return {"config": config_content}
+    except:
+        return {"config": "// Default config"}
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
