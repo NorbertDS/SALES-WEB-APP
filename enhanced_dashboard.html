@@ -1949,7 +1949,7 @@
                 </div>
                 
                 <div class="status-bar">
-                    <span class="status-indicator"></span>
+                    <span id="statusIndicator" class="status-indicator"></span>
                     <span id="statusText">Checking API connection...</span>
                 </div>
             </div>
@@ -2582,6 +2582,9 @@
     <script>
         // Railway Backend Configuration
         const RAILWAY_URL = 'https://data-analytics-master.up.railway.app';
+        const PROXY_URL = 'http://localhost:8080/proxy';
+        
+        // Try Railway directly first, fallback to proxy if CORS fails
         const API_BASE = window.location.origin.includes('localhost') 
             ? RAILWAY_URL  // Use Railway URL when running locally
             : window.location.origin;  // Use same origin when deployed
@@ -2609,8 +2612,9 @@
                 });
         }
         
-        // Make test function available globally
+        // Make test functions available globally
         window.testRailwayConnection = testRailwayConnection;
+        window.checkAPIStatus = checkAPIStatus;
         let salesData = [];
         let productsData = [];
         let filteredSalesData = [];
@@ -2723,31 +2727,78 @@
             }
         }
 
-        // Check API status
+        // Check API status with fallback
         async function checkAPIStatus() {
             try {
+                console.log('🔍 Checking API status...', { API_BASE, url: `${API_BASE}/health` });
+                
                 // Add timeout to prevent hanging
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
                 
                 const response = await fetch(`${API_BASE}/health`, {
-                    signal: controller.signal
+                    signal: controller.signal,
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
                 clearTimeout(timeoutId);
+                
+                console.log('📡 API Response:', { 
+                    status: response.status, 
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    url: response.url 
+                });
                 
                 if (response.ok) {
                     const data = await response.json();
                     console.log('✅ Railway API connected:', data);
                     document.getElementById('statusText').textContent = '✅ Railway Server Online - Ready to show analytics!';
+                    const statusIndicator = document.getElementById('statusIndicator');
+                    if (statusIndicator) statusIndicator.className = 'status-indicator online';
                     return true;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (error) {
+                console.error('❌ Direct API Connection Error:', error);
+                
+                // Try proxy fallback if direct connection fails
+                if (window.location.origin.includes('localhost')) {
+                    console.log('🔄 Trying proxy fallback...');
+                    try {
+                        const proxyResponse = await fetch(`${PROXY_URL}/health`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (proxyResponse.ok) {
+                            const data = await proxyResponse.json();
+                            console.log('✅ Proxy connection successful:', data);
+                            document.getElementById('statusText').textContent = '✅ Railway Server Online (via Proxy) - Ready to show analytics!';
+                            const statusIndicator = document.getElementById('statusIndicator');
+                            if (statusIndicator) statusIndicator.className = 'status-indicator online';
+                            return true;
+                        }
+                    } catch (proxyError) {
+                        console.error('❌ Proxy connection also failed:', proxyError);
+                    }
+                }
+                
                 if (error.name === 'AbortError') {
                     document.getElementById('statusText').textContent = '⏱️ API Server Timeout - Check connection';
                 } else {
-                    document.getElementById('statusText').textContent = '❌ API Server Offline - Please start the server';
+                    document.getElementById('statusText').textContent = `❌ API Server Offline - ${error.message}`;
                 }
+                const statusIndicator = document.getElementById('statusIndicator');
+                if (statusIndicator) statusIndicator.className = 'status-indicator offline';
                 return false;
             }
         }
