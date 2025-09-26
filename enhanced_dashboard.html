@@ -1889,10 +1889,10 @@
                     <div class="currency-selector">
                         <span class="currency-label">Currency:</span>
                         <div class="currency-options">
-                            <button class="currency-option active" onclick="setCurrency('USD')" id="usdOption">
+                            <button class="currency-option active" onclick="setCurrency('USD')" id="usdOption" style="display: inline-block;">
                                 <i class="fas fa-dollar-sign"></i> USD
                             </button>
-                            <button class="currency-option" onclick="setCurrency('KES')" id="kesOption">
+                            <button class="currency-option" onclick="setCurrency('KES')" id="kesOption" style="display: inline-block;">
                                 <i class="fas fa-shilling-sign"></i> KES
                             </button>
                         </div>
@@ -5723,6 +5723,241 @@
             }
         }
 
+        // Initialize analytics charts
+        function initializeAnalyticsCharts() {
+            try {
+                console.log('📊 Initializing analytics charts...');
+                
+                // Initialize all chart types
+                initializeNetProfitVsExpensesChart();
+                initializeGrossProfitVsCostChart();
+                initializeCostToRevenueChart();
+                initializeProfitMarginTrendChart();
+                initializeSalesPerformanceChart();
+                initializeRevenueDistributionChart();
+                
+                console.log('✅ All analytics charts initialized successfully');
+            } catch (error) {
+                console.error('❌ Error initializing analytics charts:', error);
+                showNotification('❌ Error loading analytics charts: ' + error.message, 'error');
+            }
+        }
+
+        // Individual chart initialization functions
+        function initializeNetProfitVsExpensesChart() {
+            const ctx = document.getElementById('netProfitVsExpensesChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Net Profit',
+                    data: [15000, 18000, 22000, 25000],
+                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2
+                }, {
+                    label: 'Expenses',
+                    data: [12000, 14000, 16000, 18000],
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 2
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Net Profit vs Expenses'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeGrossProfitVsCostChart() {
+            const ctx = document.getElementById('grossProfitVsCostChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Gross Profit',
+                    data: [20000, 22000, 25000, 28000, 30000, 32000],
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Cost',
+                    data: [15000, 16000, 18000, 20000, 22000, 24000],
+                    borderColor: 'rgba(245, 158, 11, 1)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.4
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Gross Profit vs Cost Trend'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeCostToRevenueChart() {
+            const ctx = document.getElementById('costToRevenueChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['Direct Costs', 'Operating Costs', 'Marketing', 'Admin', 'Other'],
+                datasets: [{
+                    label: 'Cost to Revenue Ratio',
+                    data: [65, 15, 10, 5, 5],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(168, 85, 247, 0.8)'
+                    ]
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Cost to Revenue Distribution'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeProfitMarginTrendChart() {
+            const ctx = document.getElementById('profitMarginTrendChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Profit Margin %',
+                    data: [25, 28, 32, 35],
+                    backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Profit Margin Trend'
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeSalesPerformanceChart() {
+            const ctx = document.getElementById('salesPerformanceChart');
+            if (!ctx) return;
+            
+            const data = {
+                datasets: [{
+                    label: 'Sales Performance',
+                    data: [
+                        {x: 10, y: 1000},
+                        {x: 15, y: 1500},
+                        {x: 20, y: 2000},
+                        {x: 25, y: 2500},
+                        {x: 30, y: 3000}
+                    ],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)'
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'scatter',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Sales Performance Scatter Plot'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Quantity'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Revenue'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeRevenueDistributionChart() {
+            const ctx = document.getElementById('revenueDistributionChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: ['$0-1000', '$1000-2000', '$2000-3000', '$3000-4000', '$4000+'],
+                datasets: [{
+                    label: 'Revenue Distribution',
+                    data: [5, 12, 8, 6, 3],
+                    backgroundColor: 'rgba(168, 85, 247, 0.6)',
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    borderWidth: 1
+                }]
+            };
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Revenue Distribution Histogram'
+                        }
+                    }
+                }
+            });
+        }
+
         // Show analytics panel
         function showAnalytics() {
             const panel = document.getElementById('analyticsPanel');
@@ -5734,6 +5969,11 @@
                     showNotification('⚠️ No sales data available. Please add some sales or refresh data.', 'warning');
                     return;
                 }
+
+                // Initialize all analytics charts
+                setTimeout(() => {
+                    initializeAnalyticsCharts();
+                }, 100);
                 
                 // Ensure overview tab is active by default
                 showAnalyticsTab('overview');
