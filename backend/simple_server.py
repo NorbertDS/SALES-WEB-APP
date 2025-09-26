@@ -15,12 +15,10 @@ app = FastAPI(title="Sales Analytics API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8080", 
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:8080",
-        "https://localhost:3000",
-        "*"  # Allow all origins for development
+        "https://data-analytics-master.up.railway.app",
+        "https://*.up.railway.app",
+        "https://*.railway.app",
+        "*"  # Allow all origins for Railway deployment
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],

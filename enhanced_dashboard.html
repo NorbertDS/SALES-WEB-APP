@@ -2651,9 +2651,8 @@
     <script>
         // Railway Backend Configuration
         const RAILWAY_URL = 'https://data-analytics-master.up.railway.app';
-        const PROXY_URL = 'http://localhost:8080/proxy';
         
-        // Always use Railway URL for API calls
+        // Use Railway URL for all API calls (no proxy needed)
         const API_BASE = RAILWAY_URL;
         
         // Debug function to test Railway connection
@@ -2890,30 +2889,8 @@
             } catch (error) {
                 console.error('❌ Direct API Connection Error:', error);
                 
-                // Try proxy fallback if direct connection fails
-                if (window.location.origin.includes('localhost')) {
-                    console.log('🔄 Trying proxy fallback...');
-                    try {
-                        const proxyResponse = await fetch(`${PROXY_URL}/health`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        
-                        if (proxyResponse.ok) {
-                            const data = await proxyResponse.json();
-                            console.log('✅ Proxy connection successful:', data);
-                            document.getElementById('statusText').textContent = '✅ Railway Server Online (via Proxy) - Ready to show analytics!';
-                            const statusIndicator = document.getElementById('statusIndicator');
-                            if (statusIndicator) statusIndicator.className = 'status-indicator online';
-                            return true;
-                        }
-                    } catch (proxyError) {
-                        console.error('❌ Proxy connection also failed:', proxyError);
-                    }
-                }
+                // Railway is the primary and only connection method
+                console.log('🔄 Railway connection failed, will retry automatically...');
                 
                 if (error.name === 'AbortError') {
                     document.getElementById('statusText').textContent = '⏱️ API Server Timeout - Check connection';

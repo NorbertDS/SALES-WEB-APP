@@ -4,9 +4,7 @@ const RAILWAY_URL = 'https://data-analytics-master.up.railway.app';
 
 // API Configuration
 const API_CONFIG = {
-    baseUrl: window.location.origin.includes('localhost') 
-        ? RAILWAY_URL  // Use Railway URL when running locally
-        : window.location.origin,  // Use same origin when deployed
+    baseUrl: RAILWAY_URL,  // Always use Railway URL for consistency
     
     endpoints: {
         health: '/health',
