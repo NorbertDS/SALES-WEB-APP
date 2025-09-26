@@ -1,0 +1,27 @@
+# Railway Dockerfile for Sales Analytics Pro
+FROM python:3.11-slim
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install fastapi uvicorn
+
+# Copy only the necessary files
+COPY railway_simple.py /app/
+COPY enhanced_dashboard.html /app/
+COPY config.js /app/
+COPY index.html /app/
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# Expose port
+EXPOSE $PORT
+
+# Run the simple server
+CMD ["python", "railway_simple.py"]
