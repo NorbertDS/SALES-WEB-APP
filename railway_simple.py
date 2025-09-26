@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """
-Railway Complete Server - Serves both frontend and backend
+Ultra-simple Railway server for immediate deployment
 """
 import os
-import uvicorn
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import json
+from fastapi.responses import JSONResponse, FileResponse
+import uvicorn
 
-# Create main app
-app = FastAPI(title="Sales Analytics Complete Server")
+# Create FastAPI app
+app = FastAPI(title="Sales Analytics API")
 
-# Add CORS middleware
+# Add CORS middleware with explicit configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,27 +33,26 @@ async def options_handler(path: str, request: Request):
         }
     )
 
-# Serve static files (frontend)
-app.mount("/static", StaticFiles(directory="."), name="static")
-
 @app.get("/")
-async def serve_frontend():
+async def root():
     """Serve the main dashboard"""
     return FileResponse("enhanced_dashboard.html")
 
 @app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"message": "Sales Analytics Complete Server - Railway Deployment", "status": "running", "version": "2.0.0"}
+async def health():
+    return {
+        "message": "Sales Analytics API - Railway Deployment",
+        "status": "running",
+        "version": "1.0.0"
+    }
 
-# API Endpoints - Direct implementation
 @app.get("/api/test")
 async def test():
     return {"message": "API is working", "status": "success"}
 
+# Add basic endpoints that the frontend expects
 @app.get("/api/analytics/kpis")
 async def get_kpis():
-    """Get KPI data"""
     return {
         "total_revenue": 50000,
         "total_sales": 150,
@@ -69,7 +66,6 @@ async def get_kpis():
 
 @app.get("/api/sales")
 async def get_sales():
-    """Get sales data"""
     return [
         {
             "id": 1,
@@ -89,7 +85,6 @@ async def get_sales():
 
 @app.get("/api/products")
 async def get_products():
-    """Get products data"""
     return [
         {
             "id": 1,
@@ -109,13 +104,11 @@ async def get_products():
 
 @app.post("/api/auth/login")
 async def login(request: Request):
-    """Login endpoint"""
     try:
         body = await request.json()
         email = body.get("email", "")
         password = body.get("password", "")
         
-        # Simple authentication logic
         if email and password:
             return {
                 "access_token": "demo_token_123",
@@ -128,13 +121,18 @@ async def login(request: Request):
                 }
             }
         else:
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid credentials"}
+            )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(e)}
+        )
 
 @app.get("/api/users/")
 async def get_users():
-    """Get users"""
     return [
         {
             "id": 1,
@@ -147,7 +145,6 @@ async def get_users():
 
 @app.post("/api/users/")
 async def create_user(request: Request):
-    """Create user"""
     try:
         body = await request.json()
         return {
@@ -158,11 +155,13 @@ async def create_user(request: Request):
             "is_active": True
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(e)}
+        )
 
 @app.put("/api/users/{user_id}")
 async def update_user(user_id: int, request: Request):
-    """Update user"""
     try:
         body = await request.json()
         return {
@@ -173,16 +172,17 @@ async def update_user(user_id: int, request: Request):
             "is_active": body.get("is_active", True)
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(e)}
+        )
 
 @app.delete("/api/users/{user_id}")
 async def delete_user(user_id: int):
-    """Delete user"""
     return {"message": f"User {user_id} deleted successfully"}
 
 @app.post("/api/sales")
 async def create_sale(request: Request):
-    """Create sale"""
     try:
         body = await request.json()
         return {
@@ -193,11 +193,13 @@ async def create_sale(request: Request):
             "date": "2024-01-17"
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(e)}
+        )
 
 @app.post("/api/products")
 async def create_product(request: Request):
-    """Create product"""
     try:
         body = await request.json()
         return {
@@ -208,9 +210,12 @@ async def create_product(request: Request):
             "stock": body.get("stock", 0)
         }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(e)}
+        )
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
-    print(f"Starting server on port {port}")
+    print(f"Starting Railway server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
