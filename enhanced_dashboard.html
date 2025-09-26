@@ -147,12 +147,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-
-        .auth-buttons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-wrap: nowrap;
         }
 
         .user-info {
@@ -1972,14 +1967,12 @@
                                 <span id="userRole" class="role-badge role-admin">Admin</span>
                             </div>
                         </div>
-                        <div class="auth-buttons">
-                            <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display: none;">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </button>
-                            <button class="login-btn" id="loginBtn" onclick="showLoginModal()">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </button>
-                        </div>
+                        <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display: none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                        <button class="login-btn" id="loginBtn" onclick="showLoginModal()">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2015,12 +2008,12 @@
                         <i class="fas fa-users-cog"></i> User Management
                     </button>
                 </div>
-                
-                <!-- Server Status - positioned below navigation -->
-                <div class="status-bar" style="text-align: left; margin-top: 10px;">
-                    <span id="statusIndicator" class="status-indicator"></span>
-                    <span id="statusText">Checking API connection...</span>
-                </div>
+            </div>
+            
+            <!-- Server Status - positioned below navigation, aligned left -->
+            <div class="status-bar" style="text-align: left; margin-top: 10px; margin-left: 0;">
+                <span id="statusIndicator" class="status-indicator"></span>
+                <span id="statusText">Checking API connection...</span>
             </div>
         </div>
 
@@ -2991,17 +2984,13 @@
                 profitMargin = Math.max(-100, Math.min(100, profitMargin));
             }
             
-            // If we have no costs data but have revenue, assume a reasonable cost structure
+            // If we have no costs data but have revenue, treat as 100% profit
             if (totalCosts === 0 && totalRevenue > 0) {
-                console.log('No cost data available, assuming 50% cost structure for demonstration');
-                const assumedCosts = totalRevenue * 0.5; // Assume 50% cost of goods sold
-                const assumedGrossProfit = totalRevenue - assumedCosts;
-                const assumedNetProfit = assumedGrossProfit - totalExpenses;
-                const assumedProfitMargin = (assumedNetProfit / totalRevenue * 100);
-                
-                // Update the calculations with assumed values
-                totalCosts = assumedCosts;
-                profitMargin = Math.max(-100, Math.min(100, assumedProfitMargin));
+                console.log('No cost data available, treating revenue as 100% profit');
+                // When no costs are recorded, net profit = revenue - expenses
+                const netProfit = totalRevenue - totalExpenses;
+                profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+                console.log('Calculated net profit with no costs:', { totalRevenue, totalExpenses, netProfit, profitMargin });
             }
             
             console.log('Calculated values:', {
@@ -4441,9 +4430,10 @@
                     return sum + (costPrice * quantity);
                 }, 0);
                 
-                // If no cost data, assume reasonable cost structure
+                // If no cost data, treat as 100% profit (no cost of goods sold)
                 if (totalCosts === 0 && totalRevenue > 0) {
-                    totalCosts = totalRevenue * 0.5; // Assume 50% cost of goods sold
+                    console.log('No cost data - treating as 100% profit scenario');
+                    // Keep totalCosts as 0, which means gross profit = revenue
                 }
                 
                 const grossProfit = totalRevenue - totalCosts;
@@ -6415,7 +6405,7 @@
             if (isLoggedIn && currentUser) {
                 userInfo.style.display = 'flex';
                 loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'flex';
+                logoutBtn.style.display = 'block';
                 loginPrompt.style.display = 'none';
                 mainDashboard.classList.remove('auth-required');
                 sidebar.classList.remove('auth-required');
